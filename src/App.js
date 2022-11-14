@@ -7,13 +7,11 @@ import {
   Contract,
   Admin,
   OrderHistory,
+  Login,
+  Register,
+  Reset,
 } from './pages';
-
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
@@ -21,17 +19,14 @@ function App() {
       <BrowserRouter>
         <Header />
         <Routes>
-          <Route path="/" element={<Home />}></Route>
-          <Route
-            path="/Contract"
-            element={<Contract />}
-          ></Route>
-          <Route path="/Cart" element={<Cart />}></Route>
-          <Route
-            path="/OrderHistory"
-            element={<OrderHistory />}
-          ></Route>
           <Route path="/Admin" element={<Admin />}></Route>
+          <Route path="/" element={<Home />}></Route>
+          <Route path="/Contract" element={<Contract />}></Route>
+          <Route path="/Cart" element={<Cart />}></Route>
+          <Route path="/OrderHistory" element={<OrderHistory />}></Route>
+          <Route path="/Login" element={<Login />}></Route>
+          <Route path="/Reset" element={<Reset />}></Route>
+          <Route path="/Register" element={<Register />}></Route>
         </Routes>
 
         <Footer />
