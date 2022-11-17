@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './Header.module.scss';
 import { Link, NavLink } from 'react-router-dom';
-import { FaShoppingCart, FaTimes } from 'react-icons/fa';
+import { FaShoppingCart, FaTimes, FaUserCircle } from 'react-icons/fa';
 import { HiOutlineMenuAlt3 } from 'react-icons/hi';
-import { signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../../firebase/config.js';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import {
+  REMOVE_ACTIVE_USER,
+  SET_ACTIVE_USER,
+} from '../../redux/slice/authSlice';
 
 const Active = ({ isActive }) => (isActive ? `${styles.active} ` : '');
 const logo = (
@@ -30,6 +35,10 @@ const cart = (
 
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const [displayName, setDisplayName] = useState('');
+
+  const dispatch = useDispatch();
+
   const Navigate = useNavigate();
   const tonggleMenu = () => {
     setShowMenu(!showMenu);
@@ -49,6 +58,34 @@ const Header = () => {
         toast.error(error.message);
       });
   };
+  //Monitor currently sign in user
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // console.log(user);
+        // const uid = user.uid;
+        // console.log(user.displayName);
+        // setDisplayName(user.displayName);
+        if (user.displayName === null) {
+          const name = user.email.substring(0, user.email.indexOf('@'));
+          const uName = name.charAt(0).toUpperCase() + name.slice(1);
+          setDisplayName(uName);
+        } else {
+          setDisplayName(user.displayName);
+        }
+        dispatch(
+          SET_ACTIVE_USER({
+            email: user.email,
+            userName: user.displayName,
+            userID: user.uid,
+          })
+        );
+      } else {
+        setDisplayName('');
+        dispatch(REMOVE_ACTIVE_USER());
+      }
+    });
+  }, [dispatch, displayName]);
   return (
     <header>
       <div className={styles.header}>
@@ -84,28 +121,48 @@ const Header = () => {
           </ul>
           <div className={styles['header-right']} onClick={hideMenu}>
             <span className={styles.links}>
-              <NavLink className={Active} to={'/login'}>
-                Login
-              </NavLink>
-              <NavLink className={Active} to={'/register'}>
-                Register
-              </NavLink>
-              <NavLink className={Active} to={'/order-history'}>
-                My Orders
-              </NavLink>
-              <NavLink
-                className={Active}
-                to={'/order-history'}
-                onClick={logoutUser}
-              >
-                Logout
-              </NavLink>
+              {displayName ? (
+                ''
+              ) : (
+                <NavLink className={Active} to={'/login'}>
+                  Login
+                </NavLink>
+              )}
+              {displayName ? (
+                <a href="#home">
+                  <FaUserCircle size={16} />
+                  <span>{displayName}</span>
+                </a>
+              ) : (
+                ''
+              )}
+              {displayName ? (
+                ''
+              ) : (
+                <NavLink className={Active} to={'/register'}>
+                  Register
+                </NavLink>
+              )}
+              {displayName ? (
+                <NavLink className={Active} to={'/OrderHistory'}>
+                  My Orders
+                </NavLink>
+              ) : (
+                ''
+              )}
+              {displayName ? (
+                <NavLink to={'/'} onClick={logoutUser}>
+                  Logout
+                </NavLink>
+              ) : (
+                ''
+              )}
             </span>
-            {cart}
+            {displayName ? cart : ''}
           </div>
         </nav>
         <div className={styles['menu-icon']}>
-          {cart}
+          {displayName ? cart : ''}
           <HiOutlineMenuAlt3 size={20} onClick={tonggleMenu} />
         </div>
       </div>

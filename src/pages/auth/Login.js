@@ -24,11 +24,10 @@ const Login = () => {
 
   const loginUser = (e) => {
     e.preventDefault();
-    console.log(email, password);
     setIsLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        const user = userCredential.user;
+        // const user = userCredential.user;
         setIsLoading(false);
         toast.success('Login Successful...');
         Navigate('/');
@@ -42,15 +41,15 @@ const Login = () => {
   const signInWithGoogle = (e) => {
     signInWithPopup(auth, provider)
       .then((result) => {
-        const user = result.user;
+        // const user = result.user;
         toast.success('Login Successfully...');
         Navigate('/');
       })
       .catch((error) => {
         toast.error(error.message);
-        // toast.error('jhfbsdfb');
       });
   };
+
   return (
     <>
       {isLoading && <Loader />}
